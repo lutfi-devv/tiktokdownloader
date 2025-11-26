@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Download TikTok Video | LutfiDev{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="logo">
+            <i class="fab fa-tiktok tiktok-icon"></i> TikTok Downloader
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Download Video TikTok</h4>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form action="{{ url_for('download') }}" method="post">
+                    <div class="mb-3">
+                        <label for="url" class="form-label">Masukkan URL TikTok:</label>
+                        <input type="text" class="form-control" id="url" name="url" placeholder="https://www.tiktok.com/@username/video/1234567890" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-custom">
+                            <i class="fas fa-download"></i> Download Video
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="mt-4">
+                    <h5>Cara Menggunakan:</h5>
+                    <ol>
+                        <li>Buka aplikasi TikTok</li>
+                        <li>Pilih video yang ingin diunduh</li>
+                        <li>Klik tombol "Bagikan" (Share)</li>
+                        <li>Pilih "Salin Tautan" (Copy Link)</li>
+                        <li>Tempelkan link di kolom di atas</li>
+                        <li>Klik tombol "Download Video"</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

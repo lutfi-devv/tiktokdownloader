@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Memproses Video | LutfiDev{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+        <div class="logo">
+            <i class="fab fa-tiktok tiktok-icon"></i> TikTok Downloader
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Memproses Video TikTok</h4>
+            </div>
+            <div class="card-body">
+                <div class="loading-spinner"></div>
+                <h5>Sedang memproses video Anda...</h5>
+                <p class="text-muted">Mohon tunggu sebentar, jangan tutup halaman ini.</p>
+                
+                <div class="mt-4">
+                    <div class="progress">
+                        <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            0%
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="download-result" class="mt-4" style="display: none;">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> Video berhasil diproses!
+                    </div>
+                    <a id="download-link" href="#" class="btn btn-custom">
+                        <i class="fas fa-download"></i> Download Video
+                    </a>
+                </div>
+                
+                <div id="download-error" class="mt-4" style="display: none;">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> Gagal memproses video. Silakan coba lagi.
+                    </div>
+                    <a href="{{ url_for('downloader') }}" class="btn btn-custom">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const uniqueId = "{{ unique_id }}";
+        const url = "{{ url }}";
+        const progressBar = document.getElementById('progress-bar');
+        const downloadResult = document.getElementById('download-result');
+        const downloadError = document.getElementById('download-error');
+        const downloadLink = document.getElementById('download-link');
+        
+        // Mulai proses download
+        fetch(`/start_download/${uniqueId}?url=${encodeURIComponent(url)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'started') {
+                    // Cek status setiap 2 detik
+                    const checkInterval = setInterval(() => {
+                        fetch(`/check_status/${uniqueId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.status === 'completed') {
+                                    // Update progress bar ke 100%
+                                    progressBar.style.width = '100%';
+                                    progressBar.setAttribute('aria-valuenow', 100);
+                                    progressBar.textContent = '100%';
+                                    
+                                    // Tampilkan link download
+                                    downloadLink.href = `/get_file/${data.filename}`;
+                                    downloadResult.style.display = 'block';
+                                    
+                                    // Bersihkan interval
+                                    clearInterval(checkInterval);
+                                    
+                                    // Bersihkan session setelah 5 detik
+                                    setTimeout(() => {
+                                        fetch(`/cleanup/${uniqueId}`);
+                                    }, 5000);
+                                } else {
+                                    // Update progress bar secara acak untuk efek animasi
+                                    const currentProgress = parseInt(progressBar.getAttribute('aria-valuenow'));
+                                    const newProgress = Math.min(currentProgress + Math.floor(Math.random() * 20), 90);
+                                    progressBar.style.width = `${newProgress}%`;
+                                    progressBar.setAttribute('aria-valuenow', newProgress);
+                                    progressBar.textContent = `${newProgress}%`;
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error checking status:', error);
+                                clearInterval(checkInterval);
+                                downloadError.style.display = 'block';
+                            });
+                    }, 2000);
+                    
+                    // Timeout setelah 60 detik
+                    setTimeout(() => {
+                        clearInterval(checkInterval);
+                        if (downloadResult.style.display === 'none') {
+                            downloadError.style.display = 'block';
+                        }
+                    }, 60000);
+                } else {
+                    downloadError.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error starting download:', error);
+                downloadError.style.display = 'block';
+            });
+    });
+</script>
+{% endblock %}
