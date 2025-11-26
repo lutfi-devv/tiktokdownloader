@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}TikTok Downloader | LutfiDev{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+        <div class="logo">
+            <i class="fab fa-tiktok tiktok-icon"></i> TikTok Downloader
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Selamat Datang di TikTok Downloader</h4>
+            </div>
+            <div class="card-body">
+                <p class="lead">Unduh video TikTok favorit Anda dengan mudah dan cepat!</p>
+                
+                <div class="d-flex justify-content-center mt-4">
+                    <a href="https://whatsapp.com/channel/0029VbBx5iF545uyHuvE4Q2W" target="_blank" class="btn btn-custom">
+                        <i class="fab fa-whatsapp"></i> Masuk Saluran
+                    </a>
+                    <a href="{{ url_for('downloader') }}" class="btn btn-custom">
+                        <i class="fas fa-download"></i> Lanjut
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
